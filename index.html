@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kuis Interaktif Tri Hita Karana - Kelas 7 SMP</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col justify-between">
+
+  <!-- Header PID / Sekolah -->
+  <header class="bg-gradient-to-r from-orange-600 via-amber-600 to-yellow-500 text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-3">
+      <div class="flex items-center space-x-3">
+        <div class="p-2.5 bg-white/20 rounded-xl backdrop-blur-md">
+          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-bold tracking-tight">Kuis Agama Hindu: Tri Hita Karana</h1>
+          <p class="text-xs sm:text-sm text-orange-100 font-medium">Pendidikan Agama Hindu dan Budi Pekerti — Kelas VII SMP</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="bg-white/20 px-3 py-1.5 rounded-full text-xs font-semibold text-white backdrop-blur-sm border border-white/30">
+          PID Interactive Mode
+        </span>
+        <button onclick="toggleFullscreen()" class="bg-amber-700/50 hover:bg-amber-700 p-2 rounded-lg text-white transition text-xs flex items-center gap-1 font-medium border border-amber-400/30">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4"></path></svg>
+          Layar Penuh
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Container Utama -->
+  <main class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-grow w-full">
+    
+    <!-- Tampilan Kuis Aktif -->
+    <div id="quiz-view" class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      
+      <!-- Panel Soal Utama (3 kolom) -->
+      <div class="lg:col-span-3 space-y-6">
+        
+        <!-- Status Bar Soal -->
+        <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-wrap justify-between items-center gap-3">
+          <div class="flex items-center space-x-2">
+            <span class="text-sm font-semibold text-slate-500">Soal ke:</span>
+            <span id="current-q-num" class="text-lg font-bold text-orange-600 bg-orange-50 px-3 py-1 rounded-lg border border-orange-200">1</span>
+            <span class="text-sm font-medium text-slate-400">/ 20</span>
+          </div>
+          
+          <!-- Progress Bar -->
+          <div class="flex-grow max-w-xs mx-2">
+            <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+              <div id="progress-bar" class="bg-orange-500 h-2.5 rounded-full transition-all duration-300" style="width: 5%"></div>
+            </div>
+          </div>
+
+          <div class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200">
+            Terjawab: <span id="answered-count">0</span>/20
+          </div>
+        </div>
+
+        <!-- Kartu Soal -->
+        <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-md border border-slate-200 space-y-6 relative">
+          <div class="flex items-center justify-between">
+            <span id="q-category" class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+              Parahyangan
+            </span>
+            <span class="text-xs text-slate-400 font-medium">Pilihan Ganda</span>
+          </div>
+
+          <!-- Teks Soal -->
+          <h2 id="question-text" class="text-lg sm:text-xl font-bold text-slate-800 leading-relaxed min-h-[60px]">
+            Memuat pertanyaan...
+          </h2>
+
+          <!-- Pilihan Jawaban -->
+          <div id="options-container" class="grid grid-cols-1 gap-3.5 pt-2">
+            <!-- Options dynamically loaded here -->
+          </div>
+
+          <!-- Navigasi Bawah -->
+          <div class="flex justify-between items-center pt-6 border-t border-slate-100">
+            <button id="prev-btn" onclick="prevQuestion()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl transition text-sm flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+              Sebelumnya
+            </button>
+            
+            <button id="next-btn" onclick="nextQuestion()" class="px-6 py-2.5 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-xl shadow-md shadow-orange-600/30 transition text-sm flex items-center gap-2">
+              Berikutnya
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel Palet Soal & Kontrol (1 kolom) -->
+      <div class="space-y-6">
+        <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+          <h3 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
+            <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+            Navigasi Nomor Soal
+          </h3>
+          <div id="question-palette" class="grid grid-cols-5 gap-2">
+            <!-- Palette buttons generated dynamically -->
+          </div>
+          
+          <div class="mt-4 pt-4 border-t border-slate-100 space-y-2 text-xs">
+            <div class="flex items-center gap-2 text-slate-600">
+              <span class="w-3 h-3 bg-orange-500 rounded-sm"></span> Sedang Dibuka
+            </div>
+            <div class="flex items-center gap-2 text-slate-600">
+              <span class="w-3 h-3 bg-emerald-500 rounded-sm"></span> Sudah Dijawab
+            </div>
+            <div class="flex items-center gap-2 text-slate-600">
+              <span class="w-3 h-3 bg-slate-200 rounded-sm"></span> Belum Dijawab
+            </div>
+          </div>
+        </div>
+
+        <button onclick="confirmSubmit()" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-2 text-sm">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+          Selesaikan & Kirim Kuis
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Tampilan Hasil Kuis -->
+    <div id="result-view" class="hidden space-y-8">
+      
+      <!-- Ringkasan Nilai -->
+      <div class="bg-white rounded-3xl p-8 shadow-xl border border-slate-200 text-center relative overflow-hidden">
+        <div class="absolute -top-10 -right-10 w-40 h-40 bg-orange-100 rounded-full blur-2xl"></div>
+        <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-amber-100 rounded-full blur-2xl"></div>
+
+        <div class="relative z-10 space-y-4 max-w-xl mx-auto">
+          <span id="score-badge" class="inline-block px-4 py-1.5 rounded-full text-xs font-bold tracking-wide uppercase">
+            Hasil Evaluasi
+          </span>
+
+          <h2 class="text-3xl font-extrabold text-slate-800">Hasil Pembelajaran Anda</h2>
+          
+          <div class="my-6">
+            <div id="score-circle" class="w-36 h-36 mx-auto rounded-full bg-gradient-to-tr from-orange-500 to-amber-400 text-white flex flex-col justify-center items-center shadow-lg shadow-orange-500/30 border-4 border-white">
+              <span id="score-val" class="text-4xl font-extrabold">0</span>
+              <span class="text-xs uppercase tracking-widest font-medium opacity-90">Nilai Akhir</span>
+            </div>
+          </div>
+
+          <p id="feedback-text" class="text-base text-slate-600 font-medium">
+            Memuat umpan balik...
+          </p>
+
+          <div class="grid grid-cols-3 gap-4 pt-4 border-t border-slate-100 text-center">
+            <div class="p-3 bg-slate-50 rounded-xl">
+              <p class="text-xs text-slate-400 font-semibold">Benar</p>
+              <p id="correct-count" class="text-xl font-bold text-emerald-600">0</p>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl">
+              <p class="text-xs text-slate-400 font-semibold">Salah</p>
+              <p id="wrong-count" class="text-xl font-bold text-rose-600">0</p>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl">
+              <p class="text-xs text-slate-400 font-semibold">Akurasi</p>
+              <p id="accuracy-rate" class="text-xl font-bold text-orange-600">0%</p>
+            </div>
+          </div>
+
+          <div class="pt-4 flex flex-wrap justify-center gap-3">
+            <button onclick="restartQuiz()" class="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl shadow-md transition text-sm flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+              Ulangi Kuis
+            </button>
+            <button onclick="scrollToReview()" class="px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl shadow-md transition text-sm flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+              Lihat Pembahasan Lengkap
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pembahasan Soal Lengkap -->
+      <div id="review-section" class="space-y-6">
+        <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+          <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+          Pembahasan Detail 20 Soal
+        </h3>
+        
+        <div id="review-cards-container" class="space-y-4">
+          <!-- Review item injected here -->
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer PID -->
+  <footer class="bg-white border-t border-slate-200 mt-12 py-4">
+    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+      <p>© Aplikasi Pembelajaran Interaktif Papan Informasi Digital (PID) — Agama Hindu Kelas 7 SMP</p>
+      <p class="mt-1 text-slate-400">Materi: Tri Hita Karana (Parahyangan, Pawongan, & Palemahan)</p>
+    </div>
+  </footer>
+
+  <!-- Script Logika Kuis -->
+  <script>
+    // Data Soal 20 Pilihan Ganda Tri Hita Karana Kelas 7 SMP
+    const quizData = [
+      {
+        id: 1,
+        category: "Konsep Dasar",
+        question: "Apa arti harfiah dari istilah 'Tri Hita Karana'?",
+        options: [
+          { key: "A", text: "Tiga jalan menuju kebahagiaan sejati", isCorrect: false },
+          { key: "B", text: "Tiga penyebab terciptanya kebahagiaan dan keharmonisan", isCorrect: true },
+          { key: "C", text: "Tiga bentuk persembahan yang tulus ikhlas", isCorrect: false },
+          { key: "D", text: "Tiga hubungan antara manusia dengan para dewa", isCorrect: false }
+        ],
+        explanation: "Tri Hita Karana berasal dari kata Tri (tiga), Hita (bahagia/sejahtera), dan Karana (sebab/penyebab). Jadi artinya tiga penyebab kebahagiaan dan keharmonisan."
+      },
+      {
+        id: 2,
+        category: "Struktur Tri Hita Karana",
+        question: "Konsep Tri Hita Karana mengajarkan bahwa kebahagiaan hidup manusia dapat dicapai apabila terjadi keseimbangan antara tiga unsur, yaitu...",
+        options: [
+          { key: "A", text: "Lahir, Batin, dan Roh", isCorrect: false },
+          { key: "B", text: "Parahyangan, Pawongan, dan Palemahan", isCorrect: true },
+          { key: "C", text: "Dewa Yadnya, Pitra Yadnya, dan Manusa Yadnya", isCorrect: false },
+          { key: "D", text: "Satyam, Sivam, dan Sundaram", isCorrect: false }
+        ],
+        explanation: "Tiga bagian utama Tri Hita Karana adalah Parahyangan (hubungan dengan Tuhan), Pawongan (hubungan dengan sesama manusia), dan Palemahan (hubungan dengan lingkungan alam)."
+      },
+      {
+        id: 3,
+        category: "Parahyangan",
+        question: "Bagian dari Tri Hita Karana yang mengatur hubungan harmonis antara manusia dengan Sang Hyang Widhi Wasa (Tuhan Yang Maha Esa) disebut...",
+        options: [
+          { key: "A", text: "Pawongan", isCorrect: false },
+          { key: "B", text: "Palemahan", isCorrect: false },
+          { key: "C", text: "Parahyangan", isCorrect: true },
+          { key: "D", text: "Pada Sevana", isCorrect: false }
+        ],
+        explanation: "Parahyangan berakar dari kata Hyang (Tuhan/Dewa), yang berarti hubungan yang harmonis dan selaras antara manusia dengan Tuhan Yang Maha Esa."
+      },
+      {
+        id: 4,
+        category: "Pawongan",
+        question: "Bagian dari Tri Hita Karana yang menekankan pentingnya menjaga hubungan selaras dan kasih sayang antar sesama manusia adalah...",
+        options: [
+          { key: "A", text: "Parahyangan", isCorrect: false },
+          { key: "B", text: "Pawongan", isCorrect: true },
+          { key: "C", text: "Palemahan", isCorrect: false },
+          { key: "D", text: "Purusa", isCorrect: false }
+        ],
+        explanation: "Pawongan berasal dari kata 'wong' (orang/manusia), yaitu aspek hubungan harmonis antara manusia dengan sesama manusianya."
+      },
+      {
+        id: 5,
+        category: "Palemahan",
+        question: "Bagian dari Tri Hita Karana yang mengatur hubungan harmonis dan kelestarian antara manusia dengan lingkungan alam sekitar disebut...",
+        options: [
+          { key: "A", text: "Palemahan", isCorrect: true },
+          { key: "B", text: "Pawongan", isCorrect: false },
+          { key: "C", text: "Parahyangan", isCorrect: false },
+          { key: "D", text: "Panca Sradha", isCorrect: false }
+        ],
+        explanation: "Palemahan berakar dari kata 'lemah' (tanah/lingkungan alam), yaitu hubungan harmonis antara manusia dengan alam tempat tinggalnya."
+      },
+      {
+        id: 6,
+        category: "Penerapan Parahyangan",
+        question: "Melaksanakan persembahyangan Puja Tri Sandhya secara rutin tiga kali sehari di sekolah maupun di rumah merupakan contoh nyata pengamalan aspek...",
+        options: [
+          { key: "A", text: "Palemahan", isCorrect: false },
+          { key: "B", text: "Pawongan", isCorrect: false },
+          { key: "C", text: "Parahyangan", isCorrect: true },
+          { key: "D", text: "Sad Ripu", isCorrect: false }
+        ],
+        explanation: "Puja Tri Sandhya adalah bentuk stawa/doa suci untuk menghubungkan diri dan memuja Sang Hyang Widhi Wasa (Parahyangan)."
+      },
+      {
+        id: 7,
+        category: "Penerapan Pawongan",
+        question: "Ajaran dasar dalam agama Hindu yang melandasi sikap Pawongan dengan prinsip 'Aku adalah kamu, kamu adalah aku' yaitu...",
+        options: [
+          { key: "A", text: "Vasudhaiva Kutumbakam", isCorrect: false },
+          { key: "B", text: "Tat Tvam Asi", isCorrect: true },
+          { key: "C", text: "Ahimsa Paramo Dharma", isCorrect: false },
+          { key: "D", text: "Karma Phala", isCorrect: false }
+        ],
+        explanation: "Tat Tvam Asi berarti 'Ia adalah kamu, aku adalah kamu'. Ajaran ini menekankan empathy, kesetaraan, dan kasih sayang sesama ciptaan (Pawongan)."
+      },
+      {
+        id: 8,
+        category: "Penerapan Palemahan",
+        question: "Manakah di bawah ini yang merupakan contoh penerapan ajaran Palemahan di lingkungan sekolah oleh siswa kelas 7 SMP?",
+        options: [
+          { key: "A", text: "Melaksanakan tugas piket kebersihan kelas dan memilah sampah", isCorrect: true },
+          { key: "B", text: "Menyapa dan memberi salam kepada guru saat bertemu", isCorrect: false },
+          { key: "C", text: "Berdoa bersama sebelum kegiatan belajar mengajar dimulai", isCorrect: false },
+          { key: "D", text: "Membantu teman yang mengalami kesulitan memahami pelajaran", isCorrect: false }
+        ],
+        explanation: "Piket kebersihan dan memilah sampah adalah wujud langsung menjaga kebersihan dan kelestarian lingkungan fisik sekolah (Palemahan)."
+      },
+      {
+        id: 9,
+        category: "Penerapan Palemahan",
+        question: "Hari raya Hindu yang secara khusus ditujukan untuk mengagungkan dan memohon keselamatan tumbuh-tumbuhan sebagai pengamalan Palemahan adalah...",
+        options: [
+          { key: "A", text: "Tumpek Landep", isCorrect: false },
+          { key: "B", text: "Tumpek Uduh (Wariga / Pengatag)", isCorrect: true },
+          { key: "C", text: "Tumpek Wayang", isCorrect: false },
+          { key: "D", text: "Tumpek Krulut", isCorrect: false }
+        ],
+        explanation: "Tumpek Uduh/Wariga diperingati untuk memuja Sang Hyang Taing Yoga/Sang Hyang Sangkara sebagai wujud rasa syukur dan pelestarian tumbuh-tumbuhan."
+      },
+      {
+        id: 10,
+        category: "Penerapan Pawongan",
+        question: "Menggalang dana bantuan untuk korban bencana alam dan menyantuni anak yatim merupakan penerapan dari nilai...",
+        options: [
+          { key: "A", text: "Parahyangan", isCorrect: false },
+          { key: "B", text: "Palemahan", isCorrect: false },
+          { key: "C", text: "Pawongan", isCorrect: true },
+          { key: "D", text: "Panca Niyama Brata", isCorrect: false }
+        ],
+        explanation: "Tindakan kemanusiaan dan tolong-menolong antar sesama manusia adalah manifestasi langsung dari ajaran Pawongan."
+      },
+      {
+        id: 11,
+        category: "Penerapan Parahyangan",
+        question: "Menjaga kesucian dan kebersihan Pura atau tempat ibadah di lingkungan sekitar merupakan wujud nyata pelaksanaan aspek...",
+        options: [
+          { key: "A", text: "Pawongan", isCorrect: false },
+          { key: "B", text: "Parahyangan", isCorrect: true },
+          { key: "C", text: "Palemahan", isCorrect: false },
+          { key: "D", text: "Tri Kaya Parisudha", isCorrect: false }
+        ],
+        explanation: "Pura merupakan sthana/tempat suci untuk memuja Tuhan, sehingga merawat dan menjaga kesuciannya tergolong dalam aspek Parahyangan."
+      },
+      {
+        id: 12,
+        category: "Pelanggaran Nilai",
+        question: "Tindakan penebangan pohon secara liar dan pembuangan sampah plastik di sungai melanggar prinsip Tri Hita Karana pada aspek...",
+        options: [
+          { key: "A", text: "Parahyangan", isCorrect: false },
+          { key: "B", text: "Pawongan", isCorrect: false },
+          { key: "C", text: "Palemahan", isCorrect: true },
+          { key: "D", text: "Panca Yama Brata", isCorrect: false }
+        ],
+        explanation: "Kerusakan alam akibat penebangan liar dan sampah merupakan bentuk pengabaian terhadap kelestarian lingkungan (Palemahan)."
+      },
+      {
+        id: 13,
+        category: "Tujuan Mulia",
+        question: "Tujuan utama pelaksanaan ajaran Tri Hita Karana dalam kehidupan sehari-hari adalah untuk mencapai...",
+        options: [
+          { key: "A", text: "Moksartham Jagadhitaya ca iti Dharma", isCorrect: true },
+          { key: "B", text: "Keuntungan materiil yang melimpah", isCorrect: false },
+          { key: "C", text: "Pujian dan penghargaan dari masyarakat", isCorrect: false },
+          { key: "D", text: "Kekuasaan penuh atas lingkungan alam", isCorrect: false }
+        ],
+        explanation: "Tujuan akhir ajaran Hindu adalah Moksartham Jagadhitaya ca iti Dharma, yaitu kebahagiaan lahir batin (Jagadhita) dan kebebasan jiwa (Moksha) melalui jalan Dharma."
+      },
+      {
+        id: 14,
+        category: "Pelanggaran Nilai",
+        question: "Perilaku perundungan (bullying) dan saling mengejek antar sesama siswa di lingkungan sekolah bertentangan dengan prinsip...",
+        options: [
+          { key: "A", text: "Parahyangan", isCorrect: false },
+          { key: "B", text: "Pawongan", isCorrect: true },
+          { key: "C", text: "Palemahan", isCorrect: false },
+          { key: "D", text: "Panca Sradha", isCorrect: false }
+        ],
+        explanation: "Bullying merusak hubungan persaudaraan dan kerukunan antar sesama manusia (Pawongan)."
+      },
+      {
+        id: 15,
+        category: "Penerapan Palemahan",
+        question: "Upacara Yadnya yang ditujukan untuk menjaga keharmonisan alam semesta dan menyeimbangkan unsur Bhuta Kala disebut...",
+        options: [
+          { key: "A", text: "Dewa Yadnya", isCorrect: false },
+          { key: "B", text: "Pitra Yadnya", isCorrect: false },
+          { key: "C", text: "Bhuta Yadnya", isCorrect: true },
+          { key: "D", text: "Manusa Yadnya", isCorrect: false }
+        ],
+        explanation: "Bhuta Yadnya adalah persembahan suci yang bertujuan untuk menetralisir dan menjaga keseimbangan unsur-unsur alam (Palemahan)."
+      },
+      {
+        id: 16,
+        category: "Parahyangan",
+        question: "Berikut ini yang BUKAN merupakan bentuk pelaksanaan ajaran Parahyangan adalah...",
+        options: [
+          { key: "A", text: "Sembahyang Kramaning Sembah saat Purnama", isCorrect: false },
+          { key: "B", text: "Membaca dan mempelajari kitab suci Veda", isCorrect: false },
+          { key: "C", text: "Menanam bibit pohon di halaman rumah", isCorrect: true },
+          { key: "D", text: "Mengucapkan doa sebelum dan sesudah makan", isCorrect: false }
+        ],
+        explanation: "Menanam bibit pohon merupakan tindakan menjaga lingkungan alam, sehingga merupakan bagian dari Palemahan, bukan Parahyangan."
+      },
+      {
+        id: 17,
+        category: "Pawongan",
+        question: "Sikap saling menghormati dan bekerja sama antar sesama warga sekolah tanpa membedakan suku maupun agama adalah wujud dari...",
+        options: [
+          { key: "A", text: "Pawongan", isCorrect: true },
+          { key: "B", text: "Parahyangan", isCorrect: false },
+          { key: "C", text: "Palemahan", isCorrect: false },
+          { key: "D", text: "Panca Jnanendriya", isCorrect: false }
+        ],
+        explanation: "Saling toleransi dan bekerja sama antar sesama warga sekolah mencerminkan hubungan sosial yang harmonis (Pawongan)."
+      },
+      {
+        id: 18,
+        category: "Keseimbangan Tri Hita Karana",
+        question: "Mengapa ketiga bagian Tri Hita Karana harus dilaksanakan secara seimbang dan tidak boleh dipisahkan?",
+        options: [
+          { key: "A", text: "Karena jika salah satu diabaikan, akan timbul ketidakseimbangan yang memicu penderitaan", isCorrect: true },
+          { key: "B", text: "Karena Parahyangan adalah satu-satunya bagian yang paling penting", isCorrect: false },
+          { key: "C", text: "Karena Palemahan hanya berguna bagi para petani di pedesaan", isCorrect: false },
+          { key: "D", text: "Karena Pawongan hanya berlaku untuk sesama umat Hindu saja", isCorrect: false }
+        ],
+        explanation: "Ketiga aspek saling berkaitan erat. Pengabaian salah satu unsur akan merusak keharmonisan secara menyeluruh."
+      },
+      {
+        id: 19,
+        category: "Penerapan Palemahan",
+        question: "Menerapkan kebiasaan menghemat air bersih dan menggunakan energi listrik seperlunya merupakan wujud pengamalan...",
+        options: [
+          { key: "A", text: "Hubungan manusia dengan Tuhan (Parahyangan)", isCorrect: false },
+          { key: "B", text: "Hubungan manusia dengan lingkungan alam (Palemahan)", isCorrect: true },
+          { key: "C", text: "Hubungan manusia dengan teman sebaya (Pawongan)", isCorrect: false },
+          { key: "D", text: "Hubungan murid dengan guru (Guru Bhakti)", isCorrect: false }
+        ],
+        explanation: "Menghemat sumber daya alam (air dan energi) adalah bentuk kepedulian terhadap kelestarian lingkungan hidup (Palemahan)."
+      },
+      {
+        id: 20,
+        category: "Prinsip Kebangsaan",
+        question: "Semboyan 'Vasudhaiva Kutumbakam' yang sangat erat dengan prinsip Pawongan bermakna...",
+        options: [
+          { key: "A", text: "Semua makhluk di dunia ini adalah satu keluarga besar", isCorrect: true },
+          { key: "B", text: "Alam semesta diciptakan hanya untuk manusia", isCorrect: false },
+          { key: "C", text: "Kebenaran akan selalu mengalahkan kejahatan", isCorrect: false },
+          { key: "D", text: "Tuhan berada di mana-mana dan tidak berwujud", isCorrect: false }
+        ],
+        explanation: "Vasudhaiva Kutumbakam berarti 'Seluruh dunia adalah satu keluarga tunggal', mendukung rasa persaudaraan universal (Pawongan)."
+      }
+    ];
+
+    // State Aplikasi
+    let currentQuestionIndex = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+
+    // DOM Elements
+    const quizView = document.getElementById('quiz-view');
+    const resultView = document.getElementById('result-view');
+    const currentQNum = document.getElementById('current-q-num');
+    const progressBar = document.getElementById('progress-bar');
+    const answeredCount = document.getElementById('answered-count');
+    const qCategory = document.getElementById('q-category');
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const paletteContainer = document.getElementById('question-palette');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    // Inisialisasi
+    document.addEventListener('DOMContentLoaded', () => {
+      renderPalette();
+      loadQuestion();
+    });
+
+    // Render Palet Nomor Soal
+    function renderPalette() {
+      paletteContainer.innerHTML = '';
+      quizData.forEach((q, idx) => {
+        const btn = document.createElement('button');
+        btn.innerText = idx + 1;
+        btn.id = `palette-btn-${idx}`;
+        btn.onclick = () => jumpToQuestion(idx);
+        btn.className = `h-10 rounded-lg font-bold text-sm transition border ${getPaletteStyle(idx)}`;
+        paletteContainer.appendChild(btn);
+      });
+    }
+
+    function getPaletteStyle(idx) {
+      if (idx === currentQuestionIndex) {
+        return 'bg-orange-500 text-white border-orange-600 ring-2 ring-orange-300';
+      } else if (userAnswers[idx] !== null) {
+        return 'bg-emerald-500 text-white border-emerald-600';
+      } else {
+        return 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200';
+      }
+    }
+
+    // Load Soal Aktif
+    function loadQuestion() {
+      const q = quizData[currentQuestionIndex];
+      
+      // Update UI Header Soal
+      currentQNum.innerText = currentQuestionIndex + 1;
+      qCategory.innerText = q.category;
+      questionText.innerText = q.question;
+
+      // Progress & Counters
+      const progressPercent = ((currentQuestionIndex + 1) / quizData.length) * 100;
+      progressBar.style.width = `${progressPercent}%`;
+      
+      const countAnswered = userAnswers.filter(a => a !== null).length;
+      answeredCount.innerText = countAnswered;
+
+      // Render Options
+      optionsContainer.innerHTML = '';
+      q.options.forEach((opt) => {
+        const isSelected = userAnswers[currentQuestionIndex] === opt.key;
+        
+        const optionBtn = document.createElement('button');
+        optionBtn.onclick = () => selectOption(opt.key);
+        optionBtn.className = `w-full text-left p-4 rounded-xl font-medium transition border flex items-start gap-3.5 ${
+          isSelected 
+            ? 'bg-orange-50 border-orange-500 text-orange-950 ring-2 ring-orange-400/40 shadow-sm' 
+            : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700 hover:border-slate-300'
+        }`;
+
+        optionBtn.innerHTML = `
+          <span class="w-7 h-7 rounded-lg text-xs font-bold flex items-center justify-center shrink-0 transition ${
+            isSelected ? 'bg-orange-600 text-white' : 'bg-slate-100 text-slate-600'
+          }">${opt.key}</span>
+          <span class="text-sm leading-relaxed pt-0.5">${opt.text}</span>
+        `;
+        optionsContainer.appendChild(optionBtn);
+      });
+
+      // Update Nav Buttons
+      prevBtn.disabled = currentQuestionIndex === 0;
+      prevBtn.classList.toggle('opacity-50', currentQuestionIndex === 0);
+      prevBtn.classList.toggle('cursor-not-allowed', currentQuestionIndex === 0);
+
+      if (currentQuestionIndex === quizData.length - 1) {
+        nextBtn.innerHTML = `Selesai <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+        nextBtn.classList.replace('bg-orange-600', 'bg-emerald-600');
+        nextBtn.classList.replace('hover:bg-orange-700', 'hover:bg-emerald-700');
+      } else {
+        nextBtn.innerHTML = `Berikutnya <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>`;
+        nextBtn.classList.replace('bg-emerald-600', 'bg-orange-600');
+        nextBtn.classList.replace('hover:bg-emerald-700', 'hover:bg-orange-700');
+      }
+
+      renderPalette();
+    }
+
+    // Event Handler Pilih Jawaban
+    function selectOption(key) {
+      userAnswers[currentQuestionIndex] = key;
+      loadQuestion();
+    }
+
+    // Navigasi
+    function nextQuestion() {
+      if (currentQuestionIndex < quizData.length - 1) {
+        currentQuestionIndex++;
+        loadQuestion();
+      } else {
+        confirmSubmit();
+      }
+    }
+
+    function prevQuestion() {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        loadQuestion();
+      }
+    }
+
+    function jumpToQuestion(idx) {
+      currentQuestionIndex = idx;
+      loadQuestion();
+    }
+
+    // Konfirmasi & Selesai Kuis
+    function confirmSubmit() {
+      const unanswered = userAnswers.filter(a => a === null).length;
+      let msg = "Apakah Anda yakin ingin menyelesaikan kuis ini?";
+      if (unanswered > 0) {
+        msg = `Masih ada ${unanswered} soal yang belum dijawab. Yakin ingin mengirimkan jawaban sekarang?`;
+      }
+      
+      if (confirm(msg)) {
+        calculateResult();
+      }
+    }
+
+    // Hitung Skor & Tampilkan Hasil
+    function calculateResult() {
+      let correct = 0;
+      quizData.forEach((q, idx) => {
+        const selectedKey = userAnswers[idx];
+        const correctOpt = q.options.find(o => o.isCorrect);
+        if (selectedKey === correctOpt.key) {
+          correct++;
+        }
+      });
+
+      const wrong = quizData.length - correct;
+      const score = Math.round((correct / quizData.length) * 100);
+      const accuracy = Math.round((correct / quizData.length) * 100);
+
+      // DOM Updates
+      document.getElementById('score-val').innerText = score;
+      document.getElementById('correct-count').innerText = correct;
+      document.getElementById('wrong-count').innerText = wrong;
+      document.getElementById('accuracy-rate').innerText = `${accuracy}%`;
+
+      // Feedback Text & Badges
+      const feedbackText = document.getElementById('feedback-text');
+      const scoreBadge = document.getElementById('score-badge');
+
+      if (score >= 85) {
+        scoreBadge.className = "inline-block px-4 py-1.5 rounded-full text-xs font-bold uppercase bg-emerald-100 text-emerald-800";
+        scoreBadge.innerText = "Sangat Baik (Suksma!)";
+        feedbackText.innerText = "Luar biasa! Anda telah memahami ajaran Tri Hita Karana dengan sangat baik dan siap mengamalkannya dalam kehidupan sehari-hari.";
+      } else if (score >= 70) {
+        scoreBadge.className = "inline-block px-4 py-1.5 rounded-full text-xs font-bold uppercase bg-amber-100 text-amber-800";
+        scoreBadge.innerText = "Baik (Tingkatkan)";
+        feedbackText.innerText = "Hasil yang baik! Anda sudah memahami sebagian besar materi Tri Hita Karana. Tingkatkan lagi pemahaman pada beberapa poin soal.";
+      } else {
+        scoreBadge.className = "inline-block px-4 py-1.5 rounded-full text-xs font-bold uppercase bg-rose-100 text-rose-800";
+        scoreBadge.innerText = "Perlu Belajar Lagi";
+        feedbackText.innerText = "Tetap semangat! Pelajari kembali materi Parahyangan, Pawongan, dan Palemahan melalui pembahasan di bawah ini.";
+      }
+
+      // Render Review
+      renderReviewCards();
+
+      // Switch View
+      quizView.classList.add('hidden');
+      resultView.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Render Kartu Pembahasan
+    function renderReviewCards() {
+      const container = document.getElementById('review-cards-container');
+      container.innerHTML = '';
+
+      quizData.forEach((q, idx) => {
+        const userChoiceKey = userAnswers[idx];
+        const correctOption = q.options.find(o => o.isCorrect);
+        const isUserCorrect = userChoiceKey === correctOption.key;
+
+        const card = document.createElement('div');
+        card.className = `p-5 sm:p-6 rounded-2xl border bg-white shadow-sm space-y-3 ${
+          isUserCorrect ? 'border-emerald-200 bg-emerald-50/20' : 'border-rose-200 bg-rose-50/20'
+        }`;
+
+        let optionsListHTML = '';
+        q.options.forEach(opt => {
+          let style = "text-slate-600 bg-slate-50 border-slate-200";
+          if (opt.isCorrect) {
+            style = "text-emerald-800 bg-emerald-100 border-emerald-300 font-semibold";
+          } else if (userChoiceKey === opt.key && !opt.isCorrect) {
+            style = "text-rose-800 bg-rose-100 border-rose-300 font-semibold";
+          }
+
+          optionsListHTML += `
+            <div class="p-2.5 rounded-lg border text-xs sm:text-sm flex items-center justify-between ${style}">
+              <span><strong>${opt.key}.</strong> ${opt.text}</span>
+              ${opt.isCorrect ? '<span class="text-xs bg-emerald-600 text-white px-2 py-0.5 rounded">Kunci Jawaban</span>' : ''}
+              ${userChoiceKey === opt.key && !opt.isCorrect ? '<span class="text-xs bg-rose-600 text-white px-2 py-0.5 rounded">Jawaban Anda</span>' : ''}
+            </div>
+          `;
+        });
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-3">
+            <span class="text-xs font-bold px-2.5 py-1 rounded-md ${
+              isUserCorrect ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+            }">
+              Soal ${idx + 1} • ${isUserCorrect ? 'BENAR' : 'SALAH / TIDAK DIJAWAB'}
+            </span>
+            <span class="text-xs font-semibold text-slate-400 uppercase">${q.category}</span>
+          </div>
+
+          <p class="font-bold text-slate-800 text-base">${q.question}</p>
+
+          <div class="grid grid-cols-1 gap-2 pt-1">
+            ${optionsListHTML}
+          </div>
+
+          <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs sm:text-sm text-amber-900 mt-2">
+            <strong>💡 Pembahasan:</strong> ${q.explanation}
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    // Reset Kuis
+    function restartQuiz() {
+      currentQuestionIndex = 0;
+      userAnswers = new Array(quizData.length).fill(null);
+      resultView.classList.add('hidden');
+      quizView.classList.remove('hidden');
+      loadQuestion();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function scrollToReview() {
+      document.getElementById('review-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Toggle Layar Penuh (PID Friendly)
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          alert(`Gagal masuk mode layar penuh: ${err.message}`);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+  </script>
+</body>
+</html>
